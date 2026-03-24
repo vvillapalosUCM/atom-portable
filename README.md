@@ -62,8 +62,6 @@ Ejecute siempre `3_detener_atom.bat` para evitar corrupción de datos.
 ---
 
 ## Asistente IA
-
-## Asistente IA
  
 El asistente (`http://localhost:8081`) requiere **Ollama** instalado en el equipo con al menos un modelo descargado. Ningún dato sale del equipo.
  
