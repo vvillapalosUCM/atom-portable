@@ -1,0 +1,5 @@
+atom-src/
+uploads/*
+images/*
+!uploads/.gitkeep
+!images/.gitkeep
