@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asistente IA Archivístico</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: #212529;
+  color: #fff;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 52px;
+  border-bottom: 3px solid #e85d04;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-logo { font-size: 20px; }
+.header-title { font-size: 15px; font-weight: 600; }
+.header-sub { font-size: 11px; color: #adb5bd; margin-left: 4px; }
+.status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #adb5bd; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #ffc107; animation: pulse 1.2s infinite; }
+.dot.ok { background: #28a745; animation: none; }
+.dot.err { background: #dc3545; animation: none; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* Back link */
+.back-bar {
+  background: #343a40;
+  padding: 6px 20px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.back-bar a { color: #adb5bd; text-decoration: none; }
+.back-bar a:hover { color: #fff; }
+
+/* Main layout */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.card-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #6c757d;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-body {
+  padding: 14px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Tabs */
+.tabs { display: flex; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; flex-shrink: 0; margin-bottom: 10px; }
+.tab { flex: 1; padding: 8px; text-align: center; cursor: pointer; background: #f8f9fa; border: none; font-size: 12px; font-weight: 600; color: #6c757d; transition: all .15s; }
+.tab.on { background: #e85d04; color: #fff; }
+.tab:not(.on):hover { background: #e9ecef; }
+
+/* Hint */
+.hint { font-size: 12px; color: #6c757d; margin-bottom: 10px; line-height: 1.5; flex-shrink: 0; }
+
+/* Textarea */
+textarea {
+  flex: 1;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 13px;
+  resize: none;
+  font-family: inherit;
+  line-height: 1.6;
+  min-height: 0;
+}
+textarea:focus { outline: none; border-color: #e85d04; box-shadow: 0 0 0 2px rgba(232,93,4,.15); }
+
+/* Char count */
+.cc { font-size: 11px; color: #adb5bd; text-align: right; margin-top: 5px; flex-shrink: 0; }
+
+/* Generate button */
+.btn-gen {
+  background: #e85d04; color: #fff; border: none;
+  padding: 10px; border-radius: 4px; font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; flex-shrink: 0; margin-top: 10px; transition: background .15s; width: 100%;
+}
+.btn-gen:hover { background: #d44f00; }
+.btn-gen:disabled { background: #adb5bd; cursor: not-allowed; }
+
+/* Spinner */
+.sp {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+.sp.on { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Results */
+.results { flex: 1; overflow-y: auto; min-height: 0; }
+.empty { color: #adb5bd; text-align: center; padding: 40px 16px; font-size: 13px; line-height: 2.2; }
+
+.field { border: 1px solid #e9ecef; border-radius: 4px; margin-bottom: 8px; }
+.field-label {
+  background: #f8f9fa; padding: 5px 10px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+  color: #6c757d; display: flex; justify-content: space-between; align-items: center;
+}
+.field-value { padding: 8px 10px; font-size: 13px; line-height: 1.6; color: #333; white-space: pre-wrap; word-break: break-word; }
+
+.btn-copy {
+  background: #0d6efd; color: #fff; border: none;
+  padding: 2px 8px; border-radius: 3px; font-size: 10px; cursor: pointer; font-weight: 600;
+}
+.btn-copy:hover { background: #0b5ed7; }
+.btn-copy.ok { background: #198754; }
+
+.alert-err { padding: 12px; background: #f8d7da; border: 1px solid #f5c2c7; border-radius: 4px; color: #842029; font-size: 13px; margin: 4px; }
+.alert-warn { padding: 12px; background: #fff3cd; border: 1px solid #ffecb5; border-radius: 4px; color: #664d03; font-size: 13px; }
+.loading { text-align: center; padding: 40px 16px; color: #6c757d; font-size: 13px; }
+.loading-sp { width: 32px; height: 32px; border: 3px solid #dee2e6; border-top-color: #e85d04; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+
+/* Settings bar */
+.settings-bar {
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+.settings-bar label { color: #6c757d; font-weight: 600; white-space: nowrap; }
+.settings-bar input {
+  padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px;
+  font-size: 12px; flex: 1; min-width: 0;
+}
+.settings-bar input:focus { outline: none; border-color: #e85d04; }
+.btn-save-cfg {
+  background: #198754; color: #fff; border: none;
+  padding: 5px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.btn-save-cfg:hover { background: #157347; }
+.saved-msg { color: #198754; font-size: 12px; display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <span class="header-logo">🤖</span>
+    <span class="header-title">Asistente IA Archivístico</span>
+    <span class="header-sub">· Ollama local · Privado</span>
+  </div>
+  <div class="status">
+    <span class="dot" id="dot"></span>
+    <span id="status-text">Conectando...</span>
+  </div>
+</div>
+
+<div class="back-bar">
+  <a href="http://localhost:8080" target="_blank">← Abrir AtoM</a>
+  &nbsp;·&nbsp;
+  <span style="color:#6c757d">Mantenga esta ventana abierta mientras trabaja en AtoM</span>
+</div>
+
+<div class="main">
+
+  <!-- Entrada -->
+  <div class="card">
+    <div class="card-header">📝 Texto de entrada</div>
+    <div class="card-body">
+      <div class="tabs">
+        <button class="tab on" data-tool="isad">📋 ISAD(G)</button>
+        <button class="tab" data-tool="metadata">🏷️ Metadatos</button>
+      </div>
+      <div class="hint" id="hint-isad">Pegue texto descriptivo de un fondo, serie o documento. El asistente sugerirá los campos ISAD(G).</div>
+      <div class="hint" id="hint-meta" style="display:none">Pegue el contenido de un documento. El asistente extraerá sus metadatos principales.</div>
+      <textarea id="txt" placeholder="Pegue aquí el texto a analizar..."></textarea>
+      <div class="cc"><span id="cc">0</span> caracteres</div>
+      <button class="btn-gen" id="btn">
+        <span class="sp" id="sp"></span>
+        <span id="btn-txt">✨ Generar sugerencias</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  <div class="card">
+    <div class="card-header">
+      📊 Resultado
+      <span style="font-weight:400;color:#adb5bd;font-size:11px" id="count"></span>
+    </div>
+    <div class="card-body">
+      <div class="results" id="results">
+        <div class="empty">🔍 Introduzca texto<br>y pulse <strong>Generar sugerencias</strong></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Settings bar -->
+<div class="settings-bar">
+  <label>Ollama URL:</label>
+  <input type="text" id="cfg-url" value="http://localhost:11434">
+  <label>Modelo:</label>
+  <input type="text" id="cfg-model" value="gpt-oss:20b" style="max-width:160px">
+  <button class="btn-save-cfg" id="btn-save">Guardar</button>
+  <span class="saved-msg" id="saved-msg">✓ Guardado</span>
+</div>
+
+<script>
+var ISAD = {titulo:'Título',fechas:'Fecha(s)',nivel_descripcion:'Nivel de descripción',volumen_soporte:'Volumen y soporte',nombre_productor:'Nombre del productor',historia_institucional:'Historia institucional / Reseña biográfica',historia_archivistica:'Historia archivística',forma_ingreso:'Forma de ingreso',alcance_contenido:'Alcance y contenido',sistema_organizacion:'Sistema de organización',condiciones_acceso:'Condiciones de acceso',condiciones_reproduccion:'Condiciones de reproducción',lengua:'Lengua / Escritura',notas:'Notas'};
+var META = {titulo:'Título',tipo_documento:'Tipo de documento',fecha:'Fecha',autor:'Autor / Emisor',destinatario:'Destinatario',organismo_productor:'Organismo productor',lugar:'Lugar',tema:'Tema / Asunto',palabras_clave:'Palabras clave',resumen:'Resumen',lengua:'Lengua'};
+
+var tool = 'isad';
+var url   = localStorage.getItem('ollama_url')   || 'http://localhost:11434';
+var model = localStorage.getItem('ollama_model') || 'gpt-oss:20b';
+
+document.getElementById('cfg-url').value   = url;
+document.getElementById('cfg-model').value = model;
+
+// Save settings
+document.getElementById('btn-save').addEventListener('click', function() {
+  url   = document.getElementById('cfg-url').value.trim();
+  model = document.getElementById('cfg-model').value.trim();
+  localStorage.setItem('ollama_url',   url);
+  localStorage.setItem('ollama_model', model);
+  var msg = document.getElementById('saved-msg');
+  msg.style.display = 'inline';
+  setTimeout(function() { msg.style.display = 'none'; checkOllama(); }, 1500);
+});
+
+// Status check
+async function checkOllama() {
+  var dot  = document.getElementById('dot');
+  var text = document.getElementById('status-text');
+  dot.className = 'dot';
+  text.textContent = 'Conectando...';
+  try {
+    var r = await fetch(url + '/api/tags', {signal: AbortSignal.timeout(4000)});
+    if (r.ok) {
+      dot.className = 'dot ok';
+      text.textContent = 'Ollama conectado · ' + model;
+    } else {
+      throw new Error('HTTP ' + r.status);
+    }
+  } catch(e) {
+    dot.className = 'dot err';
+    text.textContent = 'Ollama no disponible · ' + e.message;
+  }
+}
+checkOllama();
+setInterval(checkOllama, 30000);
+
+// Tabs
+document.querySelectorAll('.tab').forEach(function(t) {
+  t.addEventListener('click', function() {
+    tool = this.dataset.tool;
+    document.querySelectorAll('.tab').forEach(function(b) { b.classList.remove('on'); });
+    this.classList.add('on');
+    document.getElementById('hint-isad').style.display = tool === 'isad' ? '' : 'none';
+    document.getElementById('hint-meta').style.display = tool === 'metadata' ? '' : 'none';
+    document.getElementById('results').innerHTML = '<div class="empty">🔍 Introduzca texto<br>y pulse <strong>Generar sugerencias</strong></div>';
+    document.getElementById('count').textContent = '';
+  });
+});
+
+// Char counter
+var ta = document.getElementById('txt');
+['input','keyup','paste','change'].forEach(function(ev) {
+  ta.addEventListener(ev, function() {
+    setTimeout(function() {
+      document.getElementById('cc').textContent = ta.value.length.toLocaleString('es-ES');
+    }, 10);
+  });
+});
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showErr(m) {
+  document.getElementById('results').innerHTML = '<div class="alert-err">❌ ' + esc(m) + '</div>';
+  document.getElementById('count').textContent = '';
+}
+
+function showResults(data) {
+  var L = tool === 'isad' ? ISAD : META;
+  var h = '', n = 0;
+  for (var k in data) {
+    if (!data.hasOwnProperty(k)) continue;
+    var v = Array.isArray(data[k]) ? data[k].join(', ') : String(data[k]);
+    h += '<div class="field"><div class="field-label"><span>' + esc(L[k]||k) + '</span>'
+      + '<button class="btn-copy" data-val="' + esc(v) + '">Copiar</button></div>'
+      + '<div class="field-value">' + esc(v) + '</div></div>';
+    n++;
+  }
+  if (!n) h = '<div class="alert-warn">⚠ Sin resultados. Añada más texto descriptivo.</div>';
+  document.getElementById('results').innerHTML = h;
+  document.getElementById('count').textContent = n + ' campo' + (n !== 1 ? 's' : '');
+
+  document.querySelectorAll('.btn-copy').forEach(function(b) {
+    b.addEventListener('click', function() {
+      var btn = this, val = this.dataset.val;
+      navigator.clipboard.writeText(val).then(function() {
+        btn.textContent = '✓'; btn.classList.add('ok');
+        setTimeout(function() { btn.textContent = 'Copiar'; btn.classList.remove('ok'); }, 1800);
+      });
+    });
+  });
+}
+
+// Generate
+document.getElementById('btn').addEventListener('click', async function() {
+  var text = ta.value.trim();
+  if (!text) { showErr('Introduzca texto antes de generar.'); return; }
+
+  var btn = document.getElementById('btn');
+  var sp  = document.getElementById('sp');
+  var bt  = document.getElementById('btn-txt');
+
+  btn.disabled = true;
+  sp.classList.add('on');
+  bt.textContent = 'Procesando...';
+  document.getElementById('results').innerHTML = '<div class="loading"><div class="loading-sp"></div>Consultando ' + model + '...</div>';
+  document.getElementById('count').textContent = '';
+
+  var sys = tool === 'isad'
+    ? 'Eres un archivero experto en la norma ISAD(G). Analiza el texto y responde ÚNICAMENTE con un objeto JSON válido sin markdown. Campos posibles: titulo, fechas, nivel_descripcion (fondo/serie/expediente/documento), volumen_soporte, nombre_productor, historia_institucional, historia_archivistica, forma_ingreso, alcance_contenido, sistema_organizacion, condiciones_acceso, condiciones_reproduccion, lengua, notas. Solo incluye campos con información suficiente en el texto.'
+    : 'Eres un archivero experto. Analiza el documento y responde ÚNICAMENTE con un objeto JSON válido sin markdown. Campos posibles: titulo, tipo_documento, fecha, autor, destinatario, organismo_productor, lugar, tema, palabras_clave (array máximo 8), resumen (máximo 150 palabras), lengua. Solo incluye campos con información suficiente.';
+
+  try {
+    var r = await fetch(url + '/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {role: 'system', content: sys},
+          {role: 'user',   content: text}
+        ],
+        stream: false,
+        options: {temperature: 0.2}
+      })
+    });
+
+    if (!r.ok) { showErr('Error Ollama: HTTP ' + r.status); return; }
+
+    var j = await r.json();
+    var content = (j.message && j.message.content) ? j.message.content.trim() : '';
+
+    // Strip <think> blocks (reasoning models)
+    content = content.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+    // Strip markdown fences
+    content = content.replace(/^```(?:json)?\s*/m, '').replace(/\s*```$/m, '').trim();
+
+    var parsed = JSON.parse(content);
+    showResults(parsed);
+
+  } catch(e) {
+    if (e instanceof SyntaxError) {
+      showErr('El modelo no devolvió JSON válido. Intente de nuevo o use un modelo más potente.');
+    } else {
+      showErr('Error de conexión con Ollama: ' + e.message);
+    }
+  } finally {
+    btn.disabled = false;
+    sp.classList.remove('on');
+    bt.textContent = '✨ Generar sugerencias';
+  }
+});
+</script>
+
+</body>
+</html>

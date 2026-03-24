@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AtoM Portable + Asistente IA — Instrucciones</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+  :root{--ink:#1a1a2e;--paper:#f5f2eb;--accent:#e85d04;--muted:#6b6b7a;--border:#d4cfc4;--code-bg:#1a1a2e}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;font-size:16px}
+  header{background:var(--ink);color:#fff;padding:52px 0 44px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(232,93,4,.12) 0%,transparent 60%)}
+  .logo{display:inline-flex;align-items:center;gap:14px;margin-bottom:16px}
+  .logo-badge{width:52px;height:52px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px}
+  h1{font-family:'DM Serif Display',serif;font-size:2.6rem;font-weight:400;color:#fff;letter-spacing:-.02em}
+  .subtitle{color:rgba(255,255,255,.55);font-size:1.05rem;font-weight:300;margin-top:8px}
+  .container{max-width:840px;margin:0 auto;padding:0 24px}
+  h2{font-family:'DM Serif Display',serif;font-size:1.8rem;font-weight:400;margin:48px 0 20px;padding-bottom:10px;border-bottom:2px solid var(--border)}
+  h3{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin:24px 0 10px;color:var(--muted)}
+  p{color:var(--muted);margin-bottom:12px;line-height:1.8}
+  .steps{margin:20px 0}
+  .step{display:flex;gap:20px;margin-bottom:24px;align-items:flex-start}
+  .step-n{flex-shrink:0;width:38px;height:38px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Serif Display',serif;font-size:1.1rem;margin-top:2px}
+  .step-b{flex:1}
+  .step-b strong{display:block;font-size:1.05rem;font-weight:600;margin-bottom:5px}
+  .step-b p{margin:0;font-size:.95rem}
+  .cmd{background:var(--code-bg);color:#a8d8a8;font-family:'DM Mono',monospace;font-size:.84rem;padding:14px 18px;border-radius:6px;margin:10px 0;border-left:3px solid var(--accent);overflow-x:auto}
+  .creds{background:#fff;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:16px 0}
+  .creds table{width:100%;border-collapse:collapse}
+  .creds td{padding:12px 18px;border-bottom:1px solid var(--border);font-size:.95rem}
+  .creds td:last-child{border-bottom:none}
+  .creds td:first-child{font-weight:600;color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;width:140px}
+  .creds code{font-family:'DM Mono',monospace;font-size:.9em;background:rgba(26,26,46,.07);padding:2px 6px;border-radius:3px;color:var(--accent)}
+  .alert{padding:16px 20px;border-radius:6px;margin:16px 0;font-size:.95rem;display:flex;gap:12px}
+  .alert-warn{background:#fef9ee;border:1px solid #f0c040;color:#7a5c00}
+  .alert-info{background:#f0f4fa;border:1px solid #a8b8da;color:#1a2c5c}
+  .alert-danger{background:#fdf2f2;border:1px solid #e8b4b4;color:#7a2020}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+  .card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:20px}
+  .card .icon{font-size:1.6rem;margin-bottom:10px}
+  .card strong{display:block;font-weight:600;margin-bottom:6px;font-size:.95rem}
+  .card p{font-size:.88rem;margin:0}
+  footer{background:var(--ink);color:rgba(255,255,255,.4);text-align:center;padding:32px;margin-top:72px;font-size:.84rem;line-height:2}
+  footer a{color:rgba(255,255,255,.6)}
+  @media(max-width:600px){h1{font-size:1.9rem}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">📦</div>
+    <h1>AtoM Portable</h1>
+  </div>
+  <p class="subtitle">Access to Memory 2.10.0 + Asistente IA · Instalación local con Docker</p>
+</header>
+
+<div class="container">
+
+  <h2>Requisitos previos</h2>
+  <div class="grid2">
+    <div class="card"><div class="icon">🪟</div><strong>Windows 10 / 11</strong><p>64 bits. Cualquier edición.</p></div>
+    <div class="card"><div class="icon">🐳</div><strong>Docker Desktop</strong><p>Gratuito en <a href="https://www.docker.com/products/docker-desktop/">docker.com</a>. Versión 4.x o superior.</p></div>
+    <div class="card"><div class="icon">💾</div><strong>Espacio en disco</strong><p>Mínimo 8 GB libres (recomendado 16 GB).</p></div>
+    <div class="card"><div class="icon">🌐</div><strong>Internet</strong><p>Solo durante la instalación inicial (~3-4 GB de descargas).</p></div>
+  </div>
+
+  <h2>Instalación inicial</h2>
+  <p>Este proceso solo es necesario <strong>una vez</strong>. Tarda entre 20 y 30 minutos.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-b">
+        <strong>Instale y abra Docker Desktop</strong>
+        <p>Espere a que el icono de la ballena en la barra de tareas deje de parpadear.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-b">
+        <strong>Coloque la carpeta <code>AtomPortable</code> donde desee</strong>
+        <p>Puede instalarse en cualquier unidad: <code>C:\AtomPortable</code>, <code>D:\AtomPortable</code>, <code>E:\AtomPortable</code>... Los scripts detectan la ubicación automáticamente.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-b">
+        <strong>Ejecute <code>1_preparar_atom.bat</code></strong>
+        <p>El script descarga AtoM desde GitHub, construye la imagen Docker, guarda todo para uso offline e inicializa la base de datos. No cierre la ventana.</p>
+        <div class="alert alert-warn">⏱️ La construcción de la imagen puede tardar <strong>10–20 minutos</strong>. Es normal.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">4</div>
+      <div class="step-b">
+        <strong>Acceda a AtoM</strong>
+        <div class="cmd">http://localhost:8080</div>
+        <div class="creds">
+          <table>
+            <tr><td>Usuario</td><td><code>admin</code></td></tr>
+            <tr><td>Contraseña</td><td><code>Admin2024!</code></td></tr>
+          </table>
+        </div>
+        <div class="alert alert-danger">🔑 Cambie la contraseña inmediatamente: menú superior → <em>Admin → Mi perfil</em>.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Uso diario</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-b"><strong>Abra Docker Desktop</strong><p>Espere a que arranque completamente.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-b">
+        <strong>Ejecute <code>2_iniciar_atom.bat</code></strong>
+        <p>Arranca AtoM y el Asistente IA simultáneamente.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-b">
+        <strong>Acceda a los servicios</strong>
+        <div class="creds">
+          <table>
+            <tr><td>AtoM</td><td><code>http://localhost:8080</code></td></tr>
+            <tr><td>Asistente IA</td><td><code>http://localhost:8081</code></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger">⚠️ <strong>Importante:</strong> ejecute siempre <code>3_detener_atom.bat</code> antes de apagar el equipo o desconectar el disco para evitar corrupción de datos.</div>
+
+  <h2>Asistente IA</h2>
+  <p>El asistente (<code>http://localhost:8081</code>) conecta con <strong>Ollama</strong>, un sistema de IA que funciona completamente en local. Ningún dato sale del equipo.</p>
+
+  <h3>Instalar Ollama</h3>
+  <p>Descargue e instale Ollama desde <a href="https://ollama.com">ollama.com</a>. Luego descargue un modelo desde la línea de comandos:</p>
+  <div class="cmd">ollama pull llama3.2</div>
+
+  <h3>Usar el asistente</h3>
+  <div class="grid2">
+    <div class="card"><div class="icon">📋</div><strong>ISAD(G)</strong><p>Pegue texto descriptivo de un fondo, serie o documento. El asistente sugerirá los campos de la norma ISAD(G).</p></div>
+    <div class="card"><div class="icon">🏷️</div><strong>Metadatos</strong><p>Pegue el contenido de un documento (carta, informe, acta...). El asistente extraerá sus metadatos principales.</p></div>
+  </div>
+
+  <div class="alert alert-info">ℹ️ Configure la URL de Ollama y el modelo en la barra inferior del asistente. Los ajustes se guardan automáticamente.</div>
+
+  <h2>Acerca de AtoM</h2>
+  <p>AtoM (Access to Memory) es una aplicación web de código abierto para la descripción archivística, desarrollada por <a href="https://www.artefactual.com">Artefactual Systems</a> bajo licencia AGPLv3. Más información en <a href="https://www.accesstomemory.org">accesstomemory.org</a>.</p>
+
+</div>
+
+<footer>
+  AtoM (Access to Memory) · Artefactual Systems · Licencia AGPLv3<br>
+  <a href="https://www.accesstomemory.org">accesstomemory.org</a> · <a href="https://github.com/artefactual/atom">github.com/artefactual/atom</a>
+</footer>
+
+</body>
+</html>

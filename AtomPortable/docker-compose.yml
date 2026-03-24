@@ -1,0 +1,119 @@
+networks:
+  atom_net:
+    driver: bridge
+
+volumes:
+  atom_source:
+  mysql_data:
+  elasticsearch_data:
+
+services:
+
+  percona:
+    image: percona:8.0
+    command: >
+      mysqld
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_0900_ai_ci
+      --sql-mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+      --max-connections=50
+    environment:
+      - MYSQL_ROOT_PASSWORD=AtomRoot2024!
+      - MYSQL_DATABASE=atom
+      - MYSQL_USER=atom
+      - MYSQL_PASSWORD=AtomPass2024!
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - atom_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pAtomRoot2024!"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    environment:
+      - discovery.type=single-node
+      - cluster.routing.allocation.disk.threshold_enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.system_call_filter=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - atom_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qE '(green|yellow)'"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 30s
+
+  memcached:
+    image: memcached:1.6-alpine
+    command: -p 11211 -m 128 -u memcache
+    networks:
+      - atom_net
+    restart: unless-stopped
+
+  gearmand:
+    image: artefactual/gearmand:1.1.22
+    networks:
+      - atom_net
+    restart: unless-stopped
+
+  atom:
+    image: atom-portable:2.10.0
+    env_file: .env
+    volumes:
+      - atom_source:/atom/src
+      - ./uploads:/atom/src/uploads
+    depends_on:
+      percona:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      memcached:
+        condition: service_started
+      gearmand:
+        condition: service_started
+    networks:
+      - atom_net
+    restart: unless-stopped
+
+  atom_worker:
+    image: atom-portable:2.10.0
+    command: worker
+    env_file: .env
+    depends_on:
+      percona:
+        condition: service_healthy
+      gearmand:
+        condition: service_started
+    networks:
+      - atom_net
+    restart: unless-stopped
+
+  # nginx con configuracion incluida en la imagen
+  # Sin bind mounts — evita problemas con disco externo en Windows
+  nginx:
+    image: atom-nginx:1.0
+    ports:
+      - "8080:80"
+    volumes:
+      - atom_source:/atom/src:ro
+    depends_on:
+      - atom
+    networks:
+      - atom_net
+    restart: unless-stopped
+
+  asistente-ia:
+    image: asistente-ia:1.0
+    ports:
+      - "8081:80"
+    restart: unless-stopped
