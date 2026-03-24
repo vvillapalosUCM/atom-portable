@@ -64,50 +64,50 @@ Ejecute siempre `3_detener_atom.bat` para evitar corrupción de datos.
 ## Asistente IA
 
 ## Asistente IA
-
+ 
 El asistente (`http://localhost:8081`) requiere **Ollama** instalado en el equipo con al menos un modelo descargado. Ningún dato sale del equipo.
-
+ 
 ### Modelo recomendado
-
+ 
 El modelo recomendado es **`gpt-oss:20b`** (Microsoft Phi-4 de 20B parámetros), que ofrece el mejor equilibrio entre calidad de respuesta y rendimiento en tareas archivísticas en español:
-
+ 
 ```bash
 ollama pull gpt-oss:20b
 ```
-
+ 
 Otros modelos compatibles:
-
+ 
 | Modelo | Tamaño | Calidad | RAM mínima |
 |---|---|---|---|
 | `gpt-oss:20b` | ~13 GB | ⭐⭐⭐⭐⭐ Recomendado | 16 GB |
 | `llama3.2` | ~2 GB | ⭐⭐⭐ Bueno | 8 GB |
 | `mistral` | ~4 GB | ⭐⭐⭐⭐ Muy bueno | 8 GB |
 | `llama3.1:8b` | ~5 GB | ⭐⭐⭐⭐ Muy bueno | 8 GB |
-
+ 
 ### Tips para obtener mejores resultados
-
+ 
 **📋 Para ISAD(G):**
 - Cuanto más texto descriptivo incluya, mejores serán las sugerencias. Un párrafo mínimo.
 - Incluya información sobre el productor, las fechas y el contenido del fondo o serie.
 - Si el resultado no es satisfactorio, añada más contexto y vuelva a generar.
 - Los campos que el modelo no puede inferir del texto los omite — es el comportamiento correcto.
-
+ 
 **🏷️ Para Metadatos:**
 - Pegue el texto completo del documento, no solo el encabezado.
 - Para documentos administrativos (actas, informes, circulares) funciona especialmente bien.
 - Las palabras clave generadas pueden usarse directamente como puntos de acceso en AtoM.
-
+ 
 **⚡ Rendimiento:**
 - La primera consulta tarda más porque el modelo se carga en memoria (~30 seg con `gpt-oss:20b`).
 - Las consultas siguientes son más rápidas mientras Ollama permanezca activo.
 - Si el equipo tiene GPU compatible, Ollama la usará automáticamente para acelerar las respuestas.
 - Con `gpt-oss:20b` se recomienda cerrar otras aplicaciones pesadas durante el uso.
-
+ 
 **🔄 Si la respuesta no es correcta:**
 - Reformule el texto de entrada con más detalle.
 - Cambie a un modelo más potente si dispone de más RAM.
 - El botón **Generar sugerencias** puede pulsarse varias veces — cada respuesta puede variar ligeramente.
----
+ 
 
 ## Estructura de archivos
 
