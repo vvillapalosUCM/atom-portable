@@ -3,3 +3,4 @@ uploads/*
 images/*
 !uploads/.gitkeep
 !images/.gitkeep
+.env

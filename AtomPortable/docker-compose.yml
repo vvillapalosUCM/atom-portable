@@ -18,17 +18,17 @@ services:
       --sql-mode=STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
       --max-connections=50
     environment:
-      - MYSQL_ROOT_PASSWORD=AtomRoot2024!
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-AtomRoot2024!}
       - MYSQL_DATABASE=atom
       - MYSQL_USER=atom
-      - MYSQL_PASSWORD=AtomPass2024!
+      - MYSQL_PASSWORD=${ATOM_MYSQL_PASSWORD:-AtomPass2024!}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - atom_net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pAtomRoot2024!"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -89,6 +89,9 @@ services:
     image: atom-portable:2.10.0
     command: worker
     env_file: .env
+    volumes:
+      - atom_source:/atom/src
+      - ./uploads:/atom/src/uploads
     depends_on:
       percona:
         condition: service_healthy
@@ -98,12 +101,10 @@ services:
       - atom_net
     restart: unless-stopped
 
-  # nginx con configuracion incluida en la imagen
-  # Sin bind mounts — evita problemas con disco externo en Windows
   nginx:
     image: atom-nginx:1.0
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     volumes:
       - atom_source:/atom/src:ro
     depends_on:
@@ -115,5 +116,5 @@ services:
   asistente-ia:
     image: asistente-ia:1.0
     ports:
-      - "8081:80"
+      - "127.0.0.1:8081:80"
     restart: unless-stopped

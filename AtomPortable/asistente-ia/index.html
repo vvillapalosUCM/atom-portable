@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:* http://127.0.0.1:*; img-src 'self' data:">
 <title>Asistente IA Archivístico</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -221,7 +222,7 @@ textarea:focus { outline: none; border-color: #e85d04; box-shadow: 0 0 0 2px rgb
       </div>
       <div class="hint" id="hint-isad">Pegue texto descriptivo de un fondo, serie o documento. El asistente sugerirá los campos ISAD(G).</div>
       <div class="hint" id="hint-meta" style="display:none">Pegue el contenido de un documento. El asistente extraerá sus metadatos principales.</div>
-      <textarea id="txt" placeholder="Pegue aquí el texto a analizar..."></textarea>
+      <textarea id="txt" maxlength="100000" placeholder="Pegue aquí el texto a analizar..."></textarea>
       <div class="cc"><span id="cc">0</span> caracteres</div>
       <button class="btn-gen" id="btn">
         <span class="sp" id="sp"></span>
@@ -261,6 +262,11 @@ var META = {titulo:'Título',tipo_documento:'Tipo de documento',fecha:'Fecha',au
 
 var tool = 'isad';
 var url   = localStorage.getItem('ollama_url')   || 'http://localhost:11434';
+// Validar URL al cargar
+if (url && !url.match(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/)) {
+  url = 'http://localhost:11434';
+  localStorage.removeItem('ollama_url');
+}
 var model = localStorage.getItem('ollama_model') || 'gpt-oss:20b';
 
 document.getElementById('cfg-url').value   = url;
@@ -270,6 +276,11 @@ document.getElementById('cfg-model').value = model;
 document.getElementById('btn-save').addEventListener('click', function() {
   url   = document.getElementById('cfg-url').value.trim();
   model = document.getElementById('cfg-model').value.trim();
+  // Validar que la URL es localhost
+  if (url && !url.match(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/)) {
+    alert('Por seguridad, la URL de Ollama debe ser localhost o 127.0.0.1');
+    return;
+  }
   localStorage.setItem('ollama_url',   url);
   localStorage.setItem('ollama_model', model);
   var msg = document.getElementById('saved-msg');
@@ -359,6 +370,7 @@ function showResults(data) {
 document.getElementById('btn').addEventListener('click', async function() {
   var text = ta.value.trim();
   if (!text) { showErr('Introduzca texto antes de generar.'); return; }
+  if (text.length > 100000) { showErr('Texto demasiado largo. Maximo: 100.000 caracteres.'); return; }
 
   var btn = document.getElementById('btn');
   var sp  = document.getElementById('sp');
