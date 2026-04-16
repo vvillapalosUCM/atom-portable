@@ -42,16 +42,33 @@ if %errorlevel% neq 0 (
 
 echo Iniciando servicios...
 docker compose up -d
-
 echo.
+
+echo Esperando a que AtoM este listo...
+echo (Esto tarda aproximadamente 2 minutos, por favor espere)
+echo.
+timeout /t 30 /nobreak >nul
+echo  30 segundos...
+timeout /t 30 /nobreak >nul
+echo  60 segundos...
+timeout /t 30 /nobreak >nul
+echo  90 segundos...
+timeout /t 30 /nobreak >nul
+echo  Listo.
+echo.
+
 echo =============================================================
-echo  Servicios iniciados
+echo  AtoM en marcha
 echo.
 echo  AtoM:         http://localhost:8080
 echo  Asistente IA: http://localhost:8081
 echo.
-echo  Credenciales: las que configuro en .env
-echo  AtoM tarda 1-2 min en arrancar completamente.
+echo  Usuario AtoM: admin
+echo  Contrasena:   la que configuro en .env (ATOM_ADMIN_PASSWORD)
+echo.
+echo  Si ve un error al abrir AtoM, espere 30 segundos mas
+echo  y recargue la pagina (F5).
+echo.
 echo  Para detener: 3_detener_atom.bat
 echo =============================================================
 echo.

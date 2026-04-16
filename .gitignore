@@ -1,24 +1,6 @@
-# Variables con contraseñas reales — NUNCA subir
+atom-src/
+uploads/*
+images/*
+!uploads/.gitkeep
+!images/.gitkeep
 .env
-
-# Código fuente descargado de AtoM (se descarga en la instalación)
-AtomPortable/atom-src/
-
-# Archivos subidos a AtoM
-AtomPortable/uploads/*
-!AtomPortable/uploads/.gitkeep
-
-# Imágenes Docker offline (~8 GB)
-AtomPortable/images/*
-!AtomPortable/images/.gitkeep
-
-# Datos de base de datos (si se usan bind mounts)
-AtomPortable/datos/
-
-# Backups
-*.tar.gz
-
-# OS files
-Thumbs.db
-.DS_Store
-desktop.ini

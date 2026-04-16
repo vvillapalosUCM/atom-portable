@@ -18,6 +18,10 @@ SET D=%~dp0
 SET D=%D:~0,-1%
 cd /d "%D%"
 
+REM === Crear directorios necesarios si no existen ===
+if not exist "images"  mkdir images
+if not exist "uploads" mkdir uploads
+
 REM === Verificar que .env existe y tiene contrasenas configuradas ===
 if not exist ".env" (
     echo ERROR: No se encontro el fichero .env
@@ -37,29 +41,27 @@ SET MYSQL_ROOT_PASSWORD=
 SET ATOM_ADMIN_PASSWORD=
 SET ATOM_ADMIN_EMAIL=
 for /f "usebackq tokens=1,* delims==" %%a in (".env") do (
-    if "%%a"=="ATOM_MYSQL_PASSWORD" set "ATOM_MYSQL_PASSWORD=%%b"
-    if "%%a"=="MYSQL_ROOT_PASSWORD" set "MYSQL_ROOT_PASSWORD=%%b"
-    if "%%a"=="ATOM_ADMIN_PASSWORD" set "ATOM_ADMIN_PASSWORD=%%b"
-    if "%%a"=="ATOM_ADMIN_EMAIL" set "ATOM_ADMIN_EMAIL=%%b"
+    if "%%a"=="ATOM_MYSQL_PASSWORD"  set "ATOM_MYSQL_PASSWORD=%%b"
+    if "%%a"=="MYSQL_ROOT_PASSWORD"  set "MYSQL_ROOT_PASSWORD=%%b"
+    if "%%a"=="ATOM_ADMIN_PASSWORD"  set "ATOM_ADMIN_PASSWORD=%%b"
+    if "%%a"=="ATOM_ADMIN_EMAIL"     set "ATOM_ADMIN_EMAIL=%%b"
 )
 
 REM Verificar que las contrasenas se han cambiado
 echo %ATOM_MYSQL_PASSWORD% | findstr /C:"CAMBIAR" >nul
 if %errorlevel% equ 0 (
     echo ERROR: Las contrasenas en .env no se han configurado.
-    echo Abra .env con un editor y cambie todos los valores que dicen CAMBIAR.
+    echo Abra .env con un editor y cambie todos los valores que dicen CAMBIAR_ESTO.
     echo.
     echo   notepad .env
     echo.
     pause & exit /b 1
 )
-
 echo %MYSQL_ROOT_PASSWORD% | findstr /C:"CAMBIAR" >nul
 if %errorlevel% equ 0 (
     echo ERROR: MYSQL_ROOT_PASSWORD no se ha configurado en .env
     pause & exit /b 1
 )
-
 echo %ATOM_ADMIN_PASSWORD% | findstr /C:"CAMBIAR" >nul
 if %errorlevel% equ 0 (
     echo ERROR: ATOM_ADMIN_PASSWORD no se ha configurado en .env
@@ -101,7 +103,7 @@ if exist "atom-src\index.php" (
 echo.
 
 echo [3/6] Construyendo imagen de AtoM (10-20 min)...
-docker build -t atom-portable:2.10.0 "%D%\atom-src"
+docker build -t atom-portable:2.10.0 "atom-src"
 if %errorlevel% neq 0 (
     echo ERROR: Fallo la construccion de AtoM.
     pause & exit /b 1
@@ -110,7 +112,7 @@ echo  Imagen AtoM construida.
 echo.
 
 echo [4/6] Construyendo imagen de Nginx...
-docker build -t atom-nginx:1.0 "%D%\config"
+docker build -t atom-nginx:1.0 "config"
 if %errorlevel% neq 0 (
     echo ERROR: Fallo la construccion de Nginx.
     pause & exit /b 1
@@ -119,7 +121,7 @@ echo  Imagen Nginx construida.
 echo.
 
 echo [5/6] Construyendo imagen del Asistente IA...
-docker build -t asistente-ia:1.0 "%D%\asistente-ia"
+docker build -t asistente-ia:1.0 "asistente-ia"
 if %errorlevel% neq 0 (
     echo ERROR: Fallo la construccion del Asistente IA.
     pause & exit /b 1
@@ -127,16 +129,17 @@ if %errorlevel% neq 0 (
 echo  Imagen Asistente IA lista.
 echo.
 
+REM Rutas relativas en docker save: evita problemas de traduccion de rutas
+REM en Docker Desktop con WSL2 al usar rutas absolutas de Windows.
 echo [6/6] Guardando imagenes para uso offline...
-if not exist "images" mkdir images
-docker save -o "%D%\images\atom.tar"          atom-portable:2.10.0
-docker save -o "%D%\images\atom-nginx.tar"    atom-nginx:1.0
-docker save -o "%D%\images\asistente.tar"     asistente-ia:1.0
-docker save -o "%D%\images\nginx.tar"         nginx:1.25-alpine
-docker save -o "%D%\images\elasticsearch.tar" docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
-docker save -o "%D%\images\percona.tar"       percona:8.0
-docker save -o "%D%\images\memcached.tar"     memcached:1.6-alpine
-docker save -o "%D%\images\gearmand.tar"      artefactual/gearmand:1.1.22
+docker save -o "images\atom.tar"          atom-portable:2.10.0
+docker save -o "images\atom-nginx.tar"    atom-nginx:1.0
+docker save -o "images\asistente.tar"     asistente-ia:1.0
+docker save -o "images\nginx.tar"         nginx:1.25-alpine
+docker save -o "images\elasticsearch.tar" docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+docker save -o "images\percona.tar"       percona:8.0
+docker save -o "images\memcached.tar"     memcached:1.6-alpine
+docker save -o "images\gearmand.tar"      artefactual/gearmand:1.1.22
 echo  Imagenes guardadas.
 echo.
 
